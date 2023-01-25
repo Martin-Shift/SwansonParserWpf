@@ -1,0 +1,60 @@
+﻿<Window x:Class="SwansonParserWpf.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:SwansonParserWpf" xmlns:viewmodels="clr-namespace:SwansonParserWpf.ViewModels" d:DataContext="{d:DesignInstance Type=viewmodels:MainWindowViewModel}"
+        mc:Ignorable="d"
+        Title="MainWindow" Height="450" Width="800">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="20*"></RowDefinition>
+            <RowDefinition Height="20*"></RowDefinition>
+            <RowDefinition Height="20*"></RowDefinition>
+            <RowDefinition Height="20*"></RowDefinition>
+            <RowDefinition Height="20*"></RowDefinition>
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="30*"></ColumnDefinition>
+            <ColumnDefinition Width="30*"></ColumnDefinition>
+            <ColumnDefinition Width="20*"></ColumnDefinition>
+            <ColumnDefinition Width="20*"></ColumnDefinition>
+        </Grid.ColumnDefinitions>
+        <Button Foreground="WhiteSmoke" Background="Blue" Grid.Row="0" Grid.Column="0" Command="{Binding Path=Parse}" FontFamily="Nexa" FontSize="30" Margin="19,10,10,20" FontWeight="Bold">Load goods
+            <Button.Resources>
+                <Style TargetType="Border">
+                    <Setter Property="CornerRadius" Value="6"/>
+                </Style>
+            </Button.Resources>
+
+        </Button>
+        <DataGrid AutoGenerateColumns="False" 
+                  IsReadOnly="True"
+                  ItemsSource="{Binding Path=Products}"
+                  Grid.Row="1" Grid.ColumnSpan="2" Grid.RowSpan="4" Grid.Column="0" SelectedItem="{Binding Path=SelectedProduct}" FontFamily="Nexa" FontSize="12">
+            <DataGrid.Columns>
+                <DataGridTemplateColumn Header="Image">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <Image Source="{Binding Path=ImageSource}" Width="50" Height="50"></Image>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+                <DataGridTextColumn Header="Name" Binding="{Binding Path=Name}"></DataGridTextColumn>
+                <DataGridTextColumn Header="Vendor" Binding="{Binding Path = Vendor}"></DataGridTextColumn>
+                <DataGridTextColumn Header="Price" Binding="{Binding Path=Price}"></DataGridTextColumn>
+                <DataGridTextColumn Header="Sku ID" Binding="{Binding Path=ID}"></DataGridTextColumn>
+            </DataGrid.Columns>
+
+        </DataGrid>
+        <StackPanel Grid.Column="1" HorizontalAlignment="Left" VerticalAlignment="Center" >
+                <Label Foreground="Gray" Content="Search" FontFamily="Nexa" FontSize="10"></Label>
+                <TextBox FontSize="13"></TextBox>
+            </StackPanel>
+            <StackPanel Grid.Column="1" HorizontalAlignment="Right" VerticalAlignment="Center">
+            <Label Content="sort by" Foreground="Gray" FontFamily="Nexa" FontSize="10"></Label>
+                <ComboBox SelectedIndex="{Binding Path=SortNum}" ItemsSource="{Binding Path=SortVariants}"></ComboBox>
+            </StackPanel>
+        <Image Source="{Binding Path=ImageSource}" Grid.Column="2" Grid.Row="1"></Image>
+    </Grid>
+</Window>
