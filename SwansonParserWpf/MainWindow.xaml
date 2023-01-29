@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:SwansonParserWpf" xmlns:viewmodels="clr-namespace:SwansonParserWpf.ViewModels" d:DataContext="{d:DesignInstance Type=viewmodels:MainWindowViewModel}"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
+        Title="MainWindow" Height="491" Width="847">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="20*"></RowDefinition>
@@ -26,12 +26,22 @@
                     <Setter Property="CornerRadius" Value="6"/>
                 </Style>
             </Button.Resources>
-
         </Button>
         <DataGrid AutoGenerateColumns="False" 
                   IsReadOnly="True"
                   ItemsSource="{Binding Path=Products}"
                   Grid.Row="1" Grid.ColumnSpan="2" Grid.RowSpan="4" Grid.Column="0" SelectedItem="{Binding Path=SelectedProduct}" FontFamily="Nexa" FontSize="12">
+            <DataGrid.ContextMenu>
+                <ContextMenu>
+                    <MenuItem Command="{Binding Path=FullView}" Header="View in other page"></MenuItem>
+                    <Separator></Separator>
+                    <MenuItem Command="{Binding Path=OpenInBrowser}" Header="Open in browser"></MenuItem>
+                    <Separator></Separator>
+                    <MenuItem Command="{Binding Path=Delete}" Header="Delete from list"></MenuItem>
+                    <MenuItem Command="{Binding Path=CopyURL}" Header="Copy URL"></MenuItem>
+                    <Separator></Separator>
+                </ContextMenu>
+            </DataGrid.ContextMenu>
             <DataGrid.Columns>
                 <DataGridTemplateColumn Header="Image">
                     <DataGridTemplateColumn.CellTemplate>
@@ -41,20 +51,51 @@
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
                 <DataGridTextColumn Header="Name" Binding="{Binding Path=Name}"></DataGridTextColumn>
-                <DataGridTextColumn Header="Vendor" Binding="{Binding Path = Vendor}"></DataGridTextColumn>
                 <DataGridTextColumn Header="Price" Binding="{Binding Path=Price}"></DataGridTextColumn>
+                <DataGridTextColumn Header="Vendor" Binding="{Binding Path = Vendor}"></DataGridTextColumn>
                 <DataGridTextColumn Header="Sku ID" Binding="{Binding Path=ID}"></DataGridTextColumn>
             </DataGrid.Columns>
 
         </DataGrid>
         <StackPanel Grid.Column="1" HorizontalAlignment="Left" VerticalAlignment="Center" >
-                <Label Foreground="Gray" Content="Search" FontFamily="Nexa" FontSize="10"></Label>
-                <TextBox FontSize="13"></TextBox>
-            </StackPanel>
-            <StackPanel Grid.Column="1" HorizontalAlignment="Right" VerticalAlignment="Center">
+            <Label Foreground="Gray" Content="Search" FontFamily="Nexa" FontSize="10"></Label>
+            <TextBox FontSize="13" Text ="{Binding Path=Searchstr, UpdateSourceTrigger=PropertyChanged}"></TextBox>
+        </StackPanel>
+        <StackPanel Grid.Column="1" HorizontalAlignment="Right" VerticalAlignment="Center">
             <Label Content="sort by" Foreground="Gray" FontFamily="Nexa" FontSize="10"></Label>
-                <ComboBox SelectedIndex="{Binding Path=SortNum}" ItemsSource="{Binding Path=SortVariants}"></ComboBox>
-            </StackPanel>
-        <Image Source="{Binding Path=ImageSource}" Grid.Column="2" Grid.Row="1"></Image>
+            <ComboBox SelectedIndex="{Binding Path=SortNum}" ItemsSource="{Binding Path=SortVariants}"></ComboBox>
+        </StackPanel>
+        <Image Visibility="{Binding Path = IsSelected}" Source="{Binding Path=SelectedProduct.SelectedImage}" Grid.Column="2" Grid.ColumnSpan="2" Grid.RowSpan="2" Grid.Row="1"></Image>
+        <StackPanel Grid.Column="2" Grid.Row="3" VerticalAlignment="Center" HorizontalAlignment="Center" Orientation="Horizontal">
+            <TextBlock Text="Rating: " Visibility="{Binding IsSelected}" FontSize="15"/>
+            <TextBlock Visibility="{Binding IsSelected}" Text="{Binding Path= SelectedProduct.Rating}" Foreground="{Binding Path = SelectedProduct.RatingColor}" FontSize="15"  />
+        </StackPanel>
+        <TextBox Text="{Binding Path=SelectedProduct.Details,UpdateSourceTrigger=PropertyChanged}" Visibility="{Binding Path = IsSelected}" FontSize="15" FontFamily="Microsoft sans serif" Foreground="WhiteSmoke" FontWeight="Bold" BorderThickness="0" IsReadOnly="True" Background="LightGreen" Grid.Column="3" Grid.Row="3" HorizontalAlignment="Center" VerticalAlignment="Center" >
+            <TextBox.Resources>
+                <Style TargetType="{x:Type Border}">
+                    <Setter Property="CornerRadius" Value="6"/>
+                </Style>
+            </TextBox.Resources>
+        </TextBox>
+        <ListBox SelectedItem="{Binding Path=SelectedProduct.SelectedImage}" Grid.ColumnSpan="2" ItemsSource="{Binding Path=SelectedProduct.Images}" Visibility="{Binding Path=IsSelected}" HorizontalAlignment="Center" VerticalAlignment="Center" Grid.Row="0" Grid.Column="2">
+            <ListBox.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <StackPanel Orientation="Horizontal"/>
+                </ItemsPanelTemplate>
+            </ListBox.ItemsPanel>
+            <ListBox.ItemTemplate>
+                <DataTemplate>
+                    <Image Width="50" Height="50" Source="{Binding}"></Image>
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+        </ListBox>
+        <Button Visibility="{Binding Path=IsSelected}" Foreground="WhiteSmoke" Background="LawnGreen" Grid.Row="4" Grid.Column="2" Grid.ColumnSpan="2" Command="{Binding Path=FullView}" FontFamily="Nexa" FontSize="30" Margin="19,10,10,20" FontWeight="Bold">View full page
+            <Button.Resources>
+                <Style TargetType="Border">
+                    <Setter Property="CornerRadius" Value="7"/>
+                </Style>
+            </Button.Resources>
+
+        </Button>
     </Grid>
 </Window>

@@ -21,6 +21,9 @@ namespace SwansonParserWpf.Models
         public string Message { get; set; }
         [JsonPropertyName("longURL")]
         public string URL { get; set; }
-
+        [JsonPropertyName("productDetails")]
+        public string Details { get; set; }
+        [JsonPropertyName("rating")]
+        public double Rating { get; set; }
     }
 }
