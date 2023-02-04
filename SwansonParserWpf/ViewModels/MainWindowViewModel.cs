@@ -3,14 +3,21 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Globalization;
+using System.IO;
 using System.Linq;
 using System.Security.Policy;
 using System.Text;
+using System.Text.Json;
+using System.Text.Json.Nodes;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls.Primitives;
 using System.Windows.Input;
 using System.Windows.Media;
+using LiveCharts;
+using LiveCharts.Defaults;
+using LiveCharts.Wpf;
+using Microsoft.Win32;
 using My.BaseViewModels;
 using SwansonParserWpf.Models;
 using SwansonParserWpf.Windows;
@@ -26,6 +33,7 @@ namespace SwansonParserWpf.ViewModels
         public MainWindowViewModel()
         {
             AllProducts = new();
+            SelectedProducts = new();
         }
         public List<Product> SearchProducts { get; set; } = new();
         private List<Product> AllProducts { get; set; }
@@ -71,7 +79,6 @@ namespace SwansonParserWpf.ViewModels
                                 OnPropertyChanged(nameof(SelectedProduct));
                             });
                         }
-                        _parserWork = false;
                     }
                     catch (Exception ex)
                     {
@@ -81,6 +88,12 @@ namespace SwansonParserWpf.ViewModels
             }
         }
         private bool _parserWork = false;
+
+        public ObservableCollection<ProductViewModel> SelectedProducts { get; set; }
+        public string Total
+        {
+            get => Math.Round(SelectedProducts.Sum(x => double.Parse(x.Price, CultureInfo.InvariantCulture)), 2).ToString();
+        }
         public ICommand Parse => new RelayCommand(x =>
         {
             var url = "https://www.swansonvitamins.com/ncat1/Vitamins+and+Supplements/ncat2/Letter+Vitamins/ncat3/Vitamin+C";
@@ -97,6 +110,8 @@ namespace SwansonParserWpf.ViewModels
                         AllProducts.AddRange(list);
                         SearchProducts.AddRange(list);
                         OnPropertyChanged(nameof(Products));
+                        OnPropertyChanged(nameof(Labels));
+                        OnPropertyChanged(nameof(ByVendorChart));
                     }
                 });
 
@@ -147,6 +162,10 @@ namespace SwansonParserWpf.ViewModels
             SearchProducts.Clear();
             SearchProducts.AddRange(AllProducts);
             OnPropertyChanged(nameof(Products));
+            IsSelected = Visibility.Hidden;
+            OnPropertyChanged(nameof(IsSelected));
+            OnPropertyChanged(nameof(Labels));
+            OnPropertyChanged(nameof(ByVendorChart));
         });
         public ICommand FullView => new RelayCommand(x =>
         {
@@ -159,14 +178,75 @@ namespace SwansonParserWpf.ViewModels
         });
         public ICommand OpenInBrowser => new RelayCommand(x =>
         {
-           Process process = new Process();
+            Process process = new Process();
             try
             {
                 process.StartInfo.UseShellExecute = true;
                 process.StartInfo.FileName = SelectedProduct.URL;
                 process.Start();
             }
-            catch(Exception ex) { }
+            catch (Exception ex) { }
+        });
+        public ICommand AddToCart => new RelayCommand(x =>
+        {
+            SelectedProducts.Add(SelectedProduct);
+            OnPropertyChanged(nameof(Total));
+        });
+        public ICommand ClearCart => new RelayCommand(x =>
+        {
+            SelectedProducts.Clear();
+            IsSelected = Visibility.Hidden;
+            OnPropertyChanged(nameof(IsSelected));
+            OnPropertyChanged(nameof(Total));
+        });
+        public ICommand RemoveFromCart => new RelayCommand(x =>
+        {
+            SelectedProducts.RemoveAt(SelectedProducts.ToList().FindIndex(x => x.ID == SelectedProduct.ID));
+            IsSelected = Visibility.Hidden;
+            OnPropertyChanged(nameof(IsSelected));
+            OnPropertyChanged(nameof(Total));
+
+        });
+        public ObservableCollection<string> Labels
+        {
+            get => new ObservableCollection<string>(Products.GroupBy(x => x.Vendor).OrderByDescending(x => x.Count()).Select(g => g.Key));
+        }
+        public Func<int, string> Formatter { get; set; } = value => value.ToString("N");
+        public SeriesCollection ByVendorChart
+        {
+            get
+            {
+                var result = new SeriesCollection();
+
+                var chart = new ColumnSeries()
+                {
+                    Values = new ChartValues<int>(Products.GroupBy(x => x.Vendor).Select(x => x.Count()).OrderByDescending(x => x)),
+
+                    Title = "Number of Products by vendor"
+                };
+                result.Add(chart);
+                return result;
+            }
+        }
+        public ICommand SaveToFile => new RelayCommand(x =>
+        {
+            SaveFileDialog saveFileDialog = new()
+            {
+                Filter = "Json file (*.json)|*.json",
+            };
+            if (saveFileDialog.ShowDialog().Value == true)
+                File.WriteAllText(saveFileDialog.FileName, JsonSerializer.Serialize(AllProducts));
+        });
+        public ICommand OpenFromFile => new RelayCommand(x =>
+        {
+            OpenFileDialog openFileDialog = new()
+            {
+                Filter = "Json file (*.json)|*.json",
+            };
+            if (openFileDialog.ShowDialog().Value == true)
+            AllProducts = JsonSerializer.Deserialize<List<Product>>(File.ReadAllText(openFileDialog.FileName));
+            SearchProducts.AddRange(AllProducts);
+            OnPropertyChanged(nameof(Products));
         });
     }
 }

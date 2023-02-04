@@ -12,7 +12,7 @@ using System.Windows.Media;
 namespace SwansonParserWpf.ViewModels
 {
     public class ProductViewModel : NotifyPropertyChangedBase
-    {
+    {    
         public string Content;
         public ProductViewModel(Product product) { Product = product; }
         public Product Product { get; set; }
@@ -84,6 +84,9 @@ namespace SwansonParserWpf.ViewModels
                 return desc.InnerText.Replace("Product Description","");
             }
         }
-
+        public string ImageSource
+        {
+            get => $"https://media.swansonvitamins.com/images/items/master/{ID}.jpg";
+        }
     }
 }

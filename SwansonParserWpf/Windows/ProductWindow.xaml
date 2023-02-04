@@ -5,7 +5,8 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:SwansonParserWpf.Windows" xmlns:viewmodels="clr-namespace:SwansonParserWpf.ViewModels" d:DataContext="{d:DesignInstance Type=viewmodels:ProductViewModel}"
         mc:Ignorable="d"
-        Title="ProductWindow" Height="450" Width="800">
+        Icon="{Binding Path=SelectedImage}"
+        Title="{Binding Path=Name}" Height="450" Width="800">
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="2*"></ColumnDefinition>
@@ -44,7 +45,7 @@
         </StackPanel>
         <StackPanel Grid.Column="4" Grid.Row="1" VerticalAlignment="Center" HorizontalAlignment="Left" Orientation="Horizontal">
             <TextBlock Text="$" Foreground="DimGray" FontSize="30"/>
-            <TextBlock  Text="{Binding Path=Price}" FontSize="30"  />
+            <TextBlock  Text="{Binding Path=Price}" Foreground="DimGray" FontSize="30"  />
         </StackPanel>
         <StackPanel Grid.Column="3" Grid.Row="2" VerticalAlignment="Top" HorizontalAlignment="Left" Grid.ColumnSpan="2" Grid.RowSpan="2">
             <TextBlock Text="Product Description" FontSize="20"/>
